@@ -1,0 +1,19 @@
+import pandas as pd
+
+df = pd.DataFrame({
+    "customer_id": [101, 102, 103, 104],
+    "category": ["Electronics", "Clothing", "Electronics", "Home"],
+    "region": ["North", "South", "East", "North"],
+    "quantity": [2, 1, 5, 3],
+    "price": [50.0, 25.0, 15.0, 40.0]
+})
+
+categorical_cols = df.select_dtypes(include=["object", "category"]).columns.tolist()
+print("Categorical columns:", categorical_cols)
+df_encoded = pd.get_dummies(
+    df,
+    columns=categorical_cols,
+    drop_first=False,
+    dtype=int
+)
+print(df_encoded)
