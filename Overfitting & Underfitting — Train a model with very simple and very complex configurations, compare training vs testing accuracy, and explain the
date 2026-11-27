@@ -1,0 +1,24 @@
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+
+X, y = load_breast_cancer(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# Simple configuration (underfitting)
+simple_model = DecisionTreeClassifier(max_depth=1, random_state=42)
+simple_model.fit(X_train, y_train)
+simple_train_acc = accuracy_score(y_train, simple_model.predict(X_train))
+simple_test_acc = accuracy_score(y_test, simple_model.predict(X_test))
+
+# Complex configuration (overfitting)
+complex_model = DecisionTreeClassifier(max_depth=None, random_state=42)
+complex_model.fit(X_train, y_train)
+complex_train_acc = accuracy_score(y_train, complex_model.predict(X_train))
+complex_test_acc = accuracy_score(y_test, complex_model.predict(X_test))
+
+print(f"Simple Model  -> Train Acc: {simple_train_acc:.4f}, Test Acc: {simple_test_acc:.4f}")
+print(f"Complex Model -> Train Acc: {complex_train_acc:.4f}, Test Acc: {complex_test_acc:.4f}")
