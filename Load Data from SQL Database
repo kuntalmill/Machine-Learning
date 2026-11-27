@@ -1,0 +1,33 @@
+import sqlite3
+import pandas as pd
+
+# 1. Connect to the SQLite database (creates a sample database if it doesn't exist)
+conn = sqlite3.connect('sample_database.db')
+cursor = conn.cursor()
+
+# --- Optional: Create a sample table and insert dummy data so the code runs standalone ---
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS employees (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    department TEXT,
+    salary REAL
+)
+''')
+cursor.execute("INSERT OR IGNORE INTO employees VALUES (1, 'Alice', 'Engineering', 85000)")
+cursor.execute("INSERT OR IGNORE INTO employees VALUES (2, 'Bob', 'Marketing', 65000)")
+cursor.execute("INSERT OR IGNORE INTO employees VALUES (3, 'Charlie', 'Engineering', 92000)")
+conn.commit()
+
+# 2. Write a SQL query to fetch data
+query = "SELECT * FROM employees WHERE salary > 70000;"
+
+# 3. Load the query result directly into a Pandas DataFrame
+df_sql = pd.read_sql_query(query, conn)
+
+# 4. Inspect the loaded data
+print("Data loaded from SQL Database:")
+print(df_sql.head())
+
+# 5. Always close the database connection when finished
+conn.close()
