@@ -1,0 +1,20 @@
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+
+df = pd.DataFrame({
+    'quantity': [2.0, 5.0, 1.0, 8.0, 4.0],
+    'price': [15.0, 40.0, 10.0, 60.0, 25.0],
+    'age': [22.0, 35.0, 19.0, 48.0, 29.0],
+})
+
+minmax_scaler = MinMaxScaler()
+df_minmax = pd.DataFrame(minmax_scaler.fit_transform(df), columns=df.columns)
+
+std_scaler = StandardScaler()
+df_standard = pd.DataFrame(std_scaler.fit_transform(df), columns=df.columns)
+
+print('MinMaxScaler Output (Scaled between 0 and 1):')
+print(df_minmax.round(3))
+
+print('\nStandardScaler Output (Mean ~0, Std ~1):')
+print(df_standard.round(3))
