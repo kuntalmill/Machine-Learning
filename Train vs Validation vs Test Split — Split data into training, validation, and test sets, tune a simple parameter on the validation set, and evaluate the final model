@@ -1,0 +1,42 @@
+from sklearn.datasets import load_breast_cancer
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+
+# 1. Load dataset
+X, y = load_breast_cancer(return_X_y=True)
+
+# 2. Split into train (60%), validation (20%), and test (20%)
+X_temp, X_test, y_temp, y_test = train_test_split(
+    X, y, test_size=0.20, random_state=42, stratify=y
+)
+X_train, X_val, y_train, y_val = train_test_split(
+    X_temp, y_temp, test_size=0.25, random_state=42, stratify=y_temp
+)
+
+# 3. Train on training set and tune max_depth using validation set
+candidate_depths = [1, 2, 3, 4, 5, 8, None]
+best_depth = None
+best_val_acc = -1.0
+
+for depth in candidate_depths:
+  clf = DecisionTreeClassifier(max_depth=depth, random_state=42)
+  clf.fit(X_train, y_train)
+  val_preds = clf.predict(X_val)
+  val_acc = accuracy_score(y_val, val_preds)
+  print(f"max_depth={depth}: validation accuracy = {val_acc:.4f}")
+  if val_acc > best_val_acc:
+    best_val_acc = val_acc
+    best_depth = depth
+
+print(
+    f"\nSelected max_depth={best_depth} with validation accuracy"
+    f" {best_val_acc:.4f}"
+)
+
+# 4. Evaluate final model on the untouched test set
+final_model = DecisionTreeClassifier(max_depth=best_depth, random_state=42)
+final_model.fit(X_train, y_train)
+test_preds = final_model.predict(X_test)
+test_acc = accuracy_score(y_test, test_preds)
+print(f"Final test accuracy (max_depth={best_depth}): {test_acc:.4f}")
