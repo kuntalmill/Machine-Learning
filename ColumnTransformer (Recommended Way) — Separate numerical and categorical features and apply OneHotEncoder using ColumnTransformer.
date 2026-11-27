@@ -1,0 +1,25 @@
+import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+
+df = pd.DataFrame({
+    'category': ['Books', 'Games', 'Books', 'Electronics'],
+    'region': ['North', 'South', 'East', 'North'],
+    'quantity': [2, 1, 5, 3],
+    'price': [15.0, 40.0, 10.0, 120.0]
+})
+
+num_cols = ['quantity', 'price']
+cat_cols = ['category', 'region']
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('cat', OneHotEncoder(handle_unknown='ignore', sparse_output=False), cat_cols),
+        ('num', 'passthrough', num_cols)
+    ]
+)
+X_transformed = preprocessor.fit_transform(df)
+feature_names = preprocessor.get_feature_names_out()
+transformed_df = pd.DataFrame(X_transformed, columns=feature_names)
+
+print(transformed_df)
