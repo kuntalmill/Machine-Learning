@@ -1,0 +1,45 @@
+from sklearn.datasets import load_breast_cancer
+from sklearn.ensemble import AdaBoostClassifier, BaggingClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+
+# 1. Load dataset and split into train (80%) and test (20%) sets
+data = load_breast_cancer()
+X, y = data.data, data.target
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# 2a. Train Bagging Classifier (parallel trees)
+bagging_model = BaggingClassifier(
+    estimator=DecisionTreeClassifier(),
+    n_estimators=50,
+    random_state=42,
+)
+bagging_model.fit(X_train, y_train)
+bagging_preds = bagging_model.predict(X_test)
+
+# 2b. Train AdaBoost Classifier (sequential decision stumps)
+adaboost_model = AdaBoostClassifier(
+    estimator=DecisionTreeClassifier(max_depth=1),
+    n_estimators=50,
+    learning_rate=1.0,
+    random_state=42,
+)
+adaboost_model.fit(X_train, y_train)
+adaboost_preds = adaboost_model.predict(X_test)
+
+# 3. Evaluate and compare performance
+bagging_acc = accuracy_score(y_test, bagging_preds)
+adaboost_acc = accuracy_score(y_test, adaboost_preds)
+
+print(f"Bagging Classifier Accuracy:  {bagging_acc:.4f}")
+print(f"AdaBoost Classifier Accuracy: {adaboost_acc:.4f}\n")
+
+print("--- Bagging Classification Report ---")
+print(classification_report(y_test, bagging_preds, target_names=data.target_names))
+
+print("--- AdaBoost Classification Report ---")
+print(classification_report(y_test, adaboost_preds, target_names=data.target_names))
