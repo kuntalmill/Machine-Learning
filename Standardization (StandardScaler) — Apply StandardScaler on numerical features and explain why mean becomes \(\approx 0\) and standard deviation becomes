@@ -1,0 +1,18 @@
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+
+df = pd.DataFrame({
+    'quantity': [2.0, 5.0, 1.0, 8.0, 3.0],
+    'price': [15.0, 40.0, 10.0, 60.0, 25.0],
+    'age': [22.0, 35.0, 19.0, 48.0, 29.0],
+})
+
+# 1. Fit and transform into scaled_array
+scaler = StandardScaler()
+scaled_array = scaler.fit_transform(df)
+
+# 2. Convert back to DataFrame for readability
+df_standardized = pd.DataFrame(scaled_array, columns=df.columns)
+
+print('Standardized Data:')
+print(df_standardized.round(3))
