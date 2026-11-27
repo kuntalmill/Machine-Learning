@@ -1,0 +1,45 @@
+import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+# Sample raw dataset
+df = pd.DataFrame({
+    'quantity': [2.0, 5.0, 1.0, 8.0, 4.0, 6.0, 3.0, 7.0],
+    'price': [15.0, 40.0, 10.0, 60.0, 25.0, 45.0, 20.0, 55.0],
+    'category': ['Books', 'Electronics', 'Books', 'Electronics', 'Clothing', 'Clothing', 'Books', 'Electronics'],
+    'high_value_order': [0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0],
+})
+
+X = df.drop(columns=['high_value_order'])
+y = df['high_value_order']
+
+num_features = ['quantity', 'price']
+cat_features = ['category']
+
+# Preprocessing step: Encoding + Scaling
+preprocessor = ColumnTransformer(transformers=[
+    ('cat', OneHotEncoder(handle_unknown='ignore'), cat_features),
+    ('num', StandardScaler(), num_features),
+])
+
+# Full end-to-end pipeline: Raw Data -> Encoding & Scaling -> Model (default hyperparameters)
+full_pipeline = Pipeline(steps=[
+    ('preprocessing', preprocessor),
+    ('classifier', LogisticRegression()),
+])
+
+# Split data into train and test sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=42
+)
+
+# Fit the pipeline on training data
+full_pipeline.fit(X_train, y_train)
+
+# Make predictions on test data
+predictions = full_pipeline.predict(X_test)
+print('Test Predictions:', predictions)
+print('Actual Values:   ', y_test.values)
