@@ -1,0 +1,46 @@
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+import pandas as pd
+
+# 1. Use the correct API subdomain and endpoint path
+API_KEY = "6867302dec525efbb5439b6296f35057"
+BASE_URL = "https://themoviedb.org"
+
+# 2. Configure a session with automatic retries (helps bypass temporary network timeouts)
+session = requests.Session()
+retries = Retry(total=3, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
+session.mount("https://", HTTPAdapter(max_retries=retries))
+
+movies_list = []
+
+for page in range(1, 6):
+    params = {
+        "api_key": API_KEY,
+        "language": "en-US",
+        "page": page
+    }
+    
+    try:
+        # 3. Add a 10-second timeout so it doesn't hang indefinitely
+        response = session.get(BASE_URL, params=params, timeout=10)
+        response.raise_for_status()
+        
+        data = response.json()
+        for movie in data.get("results", []):
+            movies_list.append({
+                "id": movie.get("id"),
+                "title": movie.get("title"),
+                "release_date": movie.get("release_date"),
+                "popularity": movie.get("popularity"),
+                "vote_average": movie.get("vote_average"),
+                "vote_count": movie.get("vote_count")
+            })
+            
+    except requests.exceptions.RequestException as e:
+        print(f"Failed on page {page}: {e}")
+        break
+
+df_movies = pd.DataFrame(movies_list)
+print(f"Successfully fetched {len(df_movies)} movies!")
+print(df_movies.head())
