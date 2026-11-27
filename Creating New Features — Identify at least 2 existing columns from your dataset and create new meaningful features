@@ -1,0 +1,17 @@
+import numpy as np
+import pandas as pd
+
+df = pd.DataFrame(
+    {
+        "quantity": [2, 5, 1, 4],
+        "price": [50.0, 20.0, 120.0, 30.0],
+        "age": [22, 35, 64, 19],
+        "revenue3": [100.0, 100.0, 120.0, 120.0],
+    }
+)
+df["total_value"] = df["quantity"] * df["price"]
+df["price_per_unit"] = df["total_value"] / df["quantity"]
+df["age_group"] = pd.cut(
+    df["age"], bins=[0, 25, 45, 100], labels=["Young", "Adult", "Senior"]
+)
+print(df)
