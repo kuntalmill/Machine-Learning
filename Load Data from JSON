@@ -1,0 +1,18 @@
+import json
+import pandas as pd
+
+users_data = [
+    {"id": 1, "name": "Alice", "role": "Engineer", "active": True},
+    {"id": 2, "name": "Bob", "role": "Analyst", "active": True},
+    {"id": 3, "name": "Charlie", "role": "Designer", "active": False},
+    {"id": 4, "name": "Diana", "role": "Manager", "active": True}
+]
+
+with open("users.json", "w", encoding="utf-8") as file:
+    json.dump(users_data, file, indent=4)
+
+df_users = pd.read_json("users.json")
+
+print(df_users)
+print("\nDataFrame Info:")
+print(df_users.info())
