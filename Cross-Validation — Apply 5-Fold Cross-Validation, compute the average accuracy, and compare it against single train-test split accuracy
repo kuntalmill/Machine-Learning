@@ -1,0 +1,24 @@
+from sklearn.datasets import load_iris
+from sklearn.model_selection import KFold, cross_val_score, train_test_split
+from sklearn.tree import DecisionTreeClassifier
+
+# 1. Load dataset and define model
+X, y = load_iris(return_X_y=True)
+model = DecisionTreeClassifier(random_state=42)
+
+# Single train-test split (80% train, 20% test)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+model.fit(X_train, y_train)
+single_split_acc = model.score(X_test, y_test)
+
+# 2. Apply 5-Fold Cross-Validation
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+cv_scores = cross_val_score(model, X, y, cv=kf, scoring="accuracy")
+mean_cv_acc = cv_scores.mean()
+std_cv_acc = cv_scores.std(ddof=1)
+
+print(f"Single Train-Test Accuracy: {single_split_acc:.4f}")
+print(f"Fold Accuracies: {cv_scores}")
+print(f"5-Fold Mean Accuracy: {mean_cv_acc:.4f} (+/- {std_cv_acc:.4f})")
