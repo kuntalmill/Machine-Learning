@@ -1,0 +1,50 @@
+import pandas as pd
+from sklearn.datasets import load_breast_cancer
+from sklearn.ensemble import BaggingClassifier, RandomForestClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+
+# Load dataset and split into train (80%) and test (20%) sets
+data = load_breast_cancer()
+X, y = data.data, data.target
+feature_names = data.feature_names
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# 1. Train a Random Forest Classifier
+rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+rf_model.fit(X_train, y_train)
+rf_preds = rf_model.predict(X_test)
+rf_acc = accuracy_score(y_test, rf_preds)
+
+# 2a. Train a Single Decision Tree for comparison
+dt_model = DecisionTreeClassifier(random_state=42)
+dt_model.fit(X_train, y_train)
+dt_preds = dt_model.predict(X_test)
+dt_acc = accuracy_score(y_test, dt_preds)
+
+# 2b. Train a Bagging Classifier for comparison
+bagging_model = BaggingClassifier(
+    estimator=DecisionTreeClassifier(), n_estimators=100, random_state=42
+)
+bagging_model.fit(X_train, y_train)
+bagging_preds = bagging_model.predict(X_test)
+bagging_acc = accuracy_score(y_test, bagging_preds)
+
+# Compare performance
+print("=== Model Accuracy Comparison ===")
+print(f"Single Decision Tree Accuracy: {dt_acc:.4f}")
+print(f"Bagging Classifier Accuracy:   {bagging_acc:.4f}")
+print(f"Random Forest Accuracy:        {rf_acc:.4f}\n")
+
+# 3. Print Feature Importance (sorted highest to lowest)
+importances = pd.DataFrame({
+    "Feature": feature_names,
+    "Importance": rf_model.feature_importances_,
+}).sort_values(by="Importance", ascending=False)
+
+print("=== Top 10 Most Important Features ===")
+print(importances.head(10).to_string(index=False))
