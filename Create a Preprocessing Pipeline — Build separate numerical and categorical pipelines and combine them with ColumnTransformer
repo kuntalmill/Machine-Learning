@@ -1,0 +1,39 @@
+import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+# Sample dataset with both numerical and categorical columns
+df = pd.DataFrame({
+    'quantity': [2.0, 5.0, 1.0, 8.0, 4.0, 6.0],
+    'price': [15.0, 40.0, 10.0, 60.0, 25.0, 45.0],
+    'category': ['Books', 'Electronics', 'Books', 'Electronics', 'Clothing', 'Clothing'],
+    'region': ['North', 'South', 'East', 'West', 'North', 'South'],
+})
+
+# Separate feature names by type
+num_features = ['quantity', 'price']
+cat_features = ['category', 'region']
+
+# 1. Create separate pipelines
+num_pipeline = Pipeline(steps=[
+    ('scaler', StandardScaler())
+])
+
+cat_pipeline = Pipeline(steps=[
+    ('encoder', OneHotEncoder(handle_unknown='ignore', sparse_output=False))
+])
+
+# 2. Combine them using ColumnTransformer
+preprocessor = ColumnTransformer(transformers=[
+    ('num', num_pipeline, num_features),
+    ('cat', cat_pipeline, cat_features),
+])
+
+# Fit and transform the dataset
+processed_data = preprocessor.fit_transform(df)
+feature_names = preprocessor.get_feature_names_out()
+
+df_processed = pd.DataFrame(processed_data, columns=feature_names)
+print('Preprocessed Output:')
+print(df_processed.round(3))
